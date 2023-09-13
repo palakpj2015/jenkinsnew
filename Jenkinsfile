@@ -1,49 +1,45 @@
-properties([ 
-    parameters([
-        [
-            $class: 'ChoiceParameter', 
-            choiceType: 'PT_SINGLE_SELECT', 
-            description: 'Select a choice', 
-            filterLength: 1, 
-            filterable: true, 
-            name: 'choice1', 
-            randomName: 'choice-parameter-7601235200970', 
-            script: [
-                $class: 'GroovyScript', 
-                fallbackScript: [
-                    classpath: [], 
-                    sandbox: false, 
-                    script: 'return ["ERROR"]'
-                ], 
-                script: [
-                    classpath: [], 
-                    sandbox: false, 
-                    script: 'return[\'aaa\',\'bbb\']'
-                ]
+node {
+    properties([
+        parameters([
+            choice(
+                choices: ['USA', 'Canada', 'UK'],
+                description: 'Select a country',
+                name: 'Country'
+            ),
+            [$class: 'ChoiceParameter',
+             choiceType: 'PT_SINGLE_SELECT',
+             description: 'Select a city',
+             filterable: false,
+             name: 'City',
+             script: [
+                 $class: 'GroovyScript',
+                 fallbackScript: [
+                     classpath: [],
+                     sandbox: false,
+                     script: 'return ["Error: Script not executed"]'
+                 ],
+                 script: [
+                     classpath: [],
+                     sandbox: false,
+                     script: '''
+                        def country = Country
+                        def cities = []
+
+                        if (country == 'USA') {
+                            cities = ['New York', 'Los Angeles', 'Chicago']
+                        } else if (country == 'Canada') {
+                            cities = ['Toronto', 'Montreal', 'Vancouver']
+                        } else if (country == 'UK') {
+                            cities = ['London', 'Manchester', 'Birmingham']
+                        }
+
+                        return cities
+                     '''
+                 ]
+             ]
             ]
-        ], 
-        [
-            $class: 'CascadeChoiceParameter', 
-            choiceType: 'PT_SINGLE_SELECT', 
-            description: 'Active Choices Reactive parameter', 
-            filterLength: 1, 
-            filterable: true, 
-            name: 'choice2', 
-            randomName: 'choice-parameter-7601237141171', 
-            referencedParameters: 'choice1', 
-            script: [
-                $class: 'GroovyScript', 
-                fallbackScript: [
-                    classpath: [], 
-                    sandbox: false, 
-                    script: 'return ["error"]'
-                ], 
-                script: [
-                    classpath: [], 
-                    sandbox: false, 
-                    script: 'if(choice1.equals("aaa")){return [\'a\', \'b\']} else {return [\'aaaaaa\',\'fffffff\']}'
-                ]
-            ]
-        ]
+        ])
     ])
-])
+    
+    // Your pipeline steps go here
+}
